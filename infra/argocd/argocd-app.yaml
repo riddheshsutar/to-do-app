@@ -2,14 +2,14 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: to-do-app
-  namespace: argocd   # ArgoCD itself runs in 'argocd' namespace
+  namespace: argocd # ArgoCD itself runs in 'argocd' namespace
 spec:
   project: default
 
   source:
-    repoURL: 'https://github.com/UdayParkar/to-do-app.git'
+    repoURL: "https://github.com/riddheshsutar/to-do-app.git"
     targetRevision: main
-    path: k8s   # ✅ must match your repo folder
+    path: k8s # ✅ must match your repo folder
   destination:
     server: https://kubernetes.default.svc
     namespace: default

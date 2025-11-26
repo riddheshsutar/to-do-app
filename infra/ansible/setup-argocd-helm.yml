@@ -5,7 +5,7 @@
   vars:
     argocd_namespace: argocd
     argocd_release_name: argocd
-    values_file: ../argocd/values.yaml         
+    values_file: ../argocd/values.yaml
     app_manifest: ../argocd/argocd-app.yaml
 
   tasks:
@@ -30,10 +30,7 @@
     - name: Install ArgoCD using Helm chart
       ansible.builtin.command:
         cmd: >
-          helm install {{ argocd_release_name }} argo/argo-cd
-          --namespace {{ argocd_namespace }}
-          --create-namespace
-          -f {{ values_file }}
+          helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace -f ../argocd/values.yaml
       register: helm_install
       changed_when: "'STATUS: deployed' in helm_install.stdout or helm_install.rc == 0"
 

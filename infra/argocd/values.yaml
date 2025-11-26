@@ -1,0 +1,33 @@
+# values.yaml - ArgoCD Helm Configuration
+
+server:
+  service:
+    type: LoadBalancer   # Expose ArgoCD UI via AWS LoadBalancer
+  ingress:
+    enabled: false       # Disable ingress (optional; can enable later)
+
+configs:
+  params:
+    server.insecure: true   # Disable HTTPS for simplicity (ArgoCD will run over HTTP)
+
+repoServer:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+applicationController:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+dex:
+  enabled: true   # Keep authentication enabled (we’ll use the default admin password)
+

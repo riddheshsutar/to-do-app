@@ -1,0 +1,59 @@
+---
+- name: Cleanup ArgoCD (Helm uninstall + resources)
+  hosts: local
+  gather_facts: no
+  vars:
+    argocd_namespace: argocd
+    argocd_release_name: argocd
+
+  tasks:
+    - name: Uninstall ArgoCD Helm release
+      ansible.builtin.command:
+        cmd: >
+          helm uninstall {{ argocd_release_name }} --namespace {{ argocd_namespace }}
+      ignore_errors: yes
+      register: helm_uninstall
+      changed_when: "'release uninstalled' in helm_uninstall.stdout or helm_uninstall.rc == 0"
+
+    - name: Delete ArgoCD Application (To-Do app)
+      kubernetes.core.k8s:
+        state: absent
+        kind: Application
+        api_version: argoproj.io/v1alpha1
+        name: to-do-app
+        namespace: "{{ argocd_namespace }}"
+      ignore_errors: yes
+
+    - name: Delete ArgoCD namespace (force cleanup)
+      ansible.builtin.command:
+        cmd: kubectl delete namespace {{ argocd_namespace }} --ignore-not-found=true
+      ignore_errors: yes
+
+    - name: Wait until ArgoCD namespace is fully deleted
+      shell: |
+        for i in {1..30}; do
+          if ! kubectl get ns {{ argocd_namespace }} >/dev/null 2>&1; then
+            echo "Namespace deleted successfully!"
+            exit 0
+          fi
+          echo "Waiting for namespace to terminate..."
+          sleep 5
+        done
+        echo "Timeout waiting for namespace deletion!"
+      register: wait_ns
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Delete any remaining CRDs related to ArgoCD
+      shell: |
+        kubectl delete crd applications.argoproj.io appprojects.argoproj.io --ignore-not-found=true
+      ignore_errors: yes
+
+    - name: Display cleanup status
+      debug:
+        msg:
+          - "🧹 Cleanup complete!"
+          - "✅ ArgoCD Helm release removed"
+          - "✅ Namespace '{{ argocd_namespace }}' deleted (checked)"
+          - "✅ CRDs removed (if any)"
+

@@ -20,21 +20,29 @@ jobs:
 
   # ---- Job 2: Build & Push Docker Image ----
   build-and-push:
-    executor: docker-publisher
-    steps:
-      - checkout
-      - setup_remote_docker:
-          docker_layer_caching: false
-      - run:
-          name: Build Image
-          command: |
-            IMAGE_TAG=${CIRCLE_SHA1:0:7}
-            docker build -t sutarriddhesh22/todo-app:$IMAGE_TAG .
-      - run:
-          name: Push Image
-          command: |
-            IMAGE_TAG=${CIRCLE_SHA1:0:7}
-            docker push sutarriddhesh22/todo-app:$IMAGE_TAG
+  executor: docker-publisher
+  steps:
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: false
+
+    - run:
+        name: Configure Docker Auth (Enable Push)
+        command: |
+          mkdir -p ~/.docker
+          echo $DOCKER_AUTH_CONFIG > ~/.docker/config.json
+
+    - run:
+        name: Build Image
+        command: |
+          IMAGE_TAG=${CIRCLE_SHA1:0:7}
+          docker build -t sutarriddhesh22/todo-app:$IMAGE_TAG .
+
+    - run:
+        name: Push Image
+        command: |
+          IMAGE_TAG=${CIRCLE_SHA1:0:7}
+          docker push sutarriddhesh22/todo-app:$IMAGE_TAG
 
   # ---- Job 3: Update Kubernetes Manifests ----
   update-manifests:

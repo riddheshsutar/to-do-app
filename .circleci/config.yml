@@ -37,7 +37,6 @@ jobs:
           name: Push Docker Image
           command: |
             IMAGE_TAG=${CIRCLE_SHA1:0:7}
-            printf "%s" "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
             docker push sutarriddhesh22/todo-app:$IMAGE_TAG
 
   # ---- Job 3: Update Manifests for ArgoCD ----

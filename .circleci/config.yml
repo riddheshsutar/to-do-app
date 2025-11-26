@@ -39,7 +39,7 @@ jobs:
             IMAGE_TAG=${CIRCLE_SHA1:0:7}
             docker push sutarriddhesh22/todo-app:$IMAGE_TAG
 
-  # ---- Job 3: Update Manifests for ArgoCD ----
+  # ---- Job 3: Update Manifests for ArgoCD ---
   update-manifests:
     executor: docker-publisher
     steps:

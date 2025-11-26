@@ -3,10 +3,11 @@ version: 2.1
 executors:
   docker-executor:
     docker:
-      - image: cimg/node:18.20 # Node.js for running tests
+      - image: cimg/node:18.20
+
   docker-publisher:
     docker:
-      - image: cimg/base:stable # Base image with Docker + Git tools
+      - image: cimg/base:stable
 
 jobs:
   # ---- Job 1: Run Tests ----
@@ -14,12 +15,8 @@ jobs:
     executor: docker-executor
     steps:
       - checkout
-      - run:
-          name: Install Dependencies
-          command: npm install
-      - run:
-          name: Run Tests
-          command: npm test -- --watchAll=false
+      - run: npm install
+      - run: npm test -- --watchAll=false
 
   # ---- Job 2: Build & Push Docker Image ----
   build-and-push:
@@ -29,23 +26,23 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: false
       - run:
-          name: Build Docker Image
+          name: Build Image
           command: |
             IMAGE_TAG=${CIRCLE_SHA1:0:7}
             docker build -t sutarriddhesh22/todo-app:$IMAGE_TAG .
       - run:
-          name: Push Docker Image
+          name: Push Image
           command: |
             IMAGE_TAG=${CIRCLE_SHA1:0:7}
             docker push sutarriddhesh22/todo-app:$IMAGE_TAG
 
-  # ---- Job 3: Update Manifests for ArgoCD ---
+  # ---- Job 3: Update Kubernetes Manifests ----
   update-manifests:
     executor: docker-publisher
     steps:
       - checkout
       - run:
-          name: Update Kubernetes Manifests with new Image Tag
+          name: Update Deployment Image Tag
           command: |
             IMAGE_TAG=${CIRCLE_SHA1:0:7}
             sed -i "s|sutarriddhesh22/todo-app:.*|sutarriddhesh22/todo-app:$IMAGE_TAG|g" k8s/deployment.yaml

@@ -1,18 +1,19 @@
-# Automating Deployment of a Dockerized ToDo App on AWS EKS Using GitOps and ArgoCD 
+# Automating Deployment of a Dockerized ToDo App on AWS EKS Using GitOps and ArgoCD
 
 ## 📌 Project Overview
 
 This project demonstrates a **cloud-native DevOps workflow** for deploying a React-based To-Do application using modern practices:
 
-- **Terraform** → Infrastructure as Code (VPC, EKS, IAM, EC2 worker nodes)  
-- **CircleCI** → CI/CD pipeline for Docker build & push  
-- **ArgoCD** → GitOps for Kubernetes sync and self-healing  
-- **Ansible** → Infrastructure automation for ArgoCD setup via Helm  
-- **Docker** → Containerized React app served via Nginx  
+- **Terraform** → Infrastructure as Code (VPC, EKS, IAM, EC2 worker nodes)
+- **CircleCI** → CI/CD pipeline for Docker build & push
+- **ArgoCD** → GitOps for Kubernetes sync and self-healing
+- **Ansible** → Infrastructure automation for ArgoCD setup via Helm
+- **Docker** → Containerized React app served via Nginx
 
 The result is a fully automated, scalable, and reliable workflow from **code → container → cluster → end-user**.
 
 ### Key Components:
+
 - **AWS EKS Cluster**: Managed Kubernetes control plane
 - **VPC & Subnets**: Secure network infrastructure with public/private subnets
 - **CircleCI**: Automated CI/CD pipeline
@@ -70,13 +71,15 @@ to-do-app/
 
 ### End-to-End Pipeline:
 
-1. **Infrastructure Provisioning (Terraform)**  
+1. **Infrastructure Provisioning (Terraform)**
+
    - Creates VPC with public/private subnets across multiple AZs
    - Provisions EKS cluster with managed node group
    - Configures IAM roles and security groups
    - Sets up networking components (NAT Gateway, Internet Gateway)
 
-2. **Continuous Integration (CircleCI)**  
+2. **Continuous Integration (CircleCI)**
+
    - Triggers on Git push to main branch
    - Runs linting and unit tests
    - Builds Docker image with versioned tag
@@ -84,20 +87,22 @@ to-do-app/
    - Updates Kubernetes manifests with new image tag
    - Commits changes back to GitHub repository
 
-3. **Continuous Deployment (ArgoCD)**  
+3. **Continuous Deployment (ArgoCD)**
+
    - Monitors GitHub repository for manifest changes
    - Automatically syncs desired state to EKS cluster
    - Performs health checks on deployed resources
    - Provides self-healing capabilities
    - Enables easy rollback if needed
 
-4. **Kubernetes Orchestration**  
+4. **Kubernetes Orchestration**
+
    - Deploys pods running the To-Do application
    - Creates LoadBalancer service
    - Manages replicas and rolling updates
    - Handles pod scheduling and resource allocation
 
-5. **User Access**  
+5. **User Access**
    - Application accessible via AWS ELB DNS hostname
    - Traffic routed through AWS Load Balancer
    - High availability across multiple nodes
@@ -117,6 +122,7 @@ Before you begin, ensure you have the following installed:
 - **Git** - [Installation](https://git-scm.com/downloads)
 
 ### Required Accounts:
+
 - AWS Account with appropriate IAM permissions
 - Docker Hub account
 - GitHub account
@@ -159,6 +165,7 @@ terraform apply -var-file="secrets.tfvars"
 ```
 
 This will create:
+
 - VPC with 3 public and 3 private subnets
 - EKS cluster (control plane) in ap-south-1 region
 - Managed node group with m7i-flex.large instances (2-3 nodes)
@@ -183,17 +190,19 @@ ansible-playbook -i inventory.ini setup-argocd-helm.yml
 ```
 
 This playbook will:
-* Create the `argocd` namespace
-* Install ArgoCD via Helm using custom values
-* Deploy the To-Do app ArgoCD Application manifest
-* Display the ArgoCD UI URL and admin credentials
+
+- Create the `argocd` namespace
+- Install ArgoCD via Helm using custom values
+- Deploy the To-Do app ArgoCD Application manifest
+- Display the ArgoCD UI URL and admin credentials
 
 **Access ArgoCD UI:**
 
 The playbook output will provide:
-* **UI URL**: `http://<LoadBalancer-DNS>` (from AWS ELB)
-* **Username**: `admin`
-* **Password**: Retrieved automatically from the secret
+
+- **UI URL**: `http://<LoadBalancer-DNS>` (from AWS ELB)
+- **Username**: `admin`
+- **Password**: Retrieved automatically from the secret
 
 Alternatively, get the details manually:
 
@@ -208,6 +217,7 @@ kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.pas
 ### Step 7: 🔁 Continuous Integration (CircleCI)
 
 **Pipeline tasks:**
+
 1. Run tests (`npm test`)
 2. Build Docker image
 3. Push image to DockerHub with commit SHA
@@ -236,36 +246,43 @@ Open browser: `http://<EXTERNAL-IP>`
 ## 📸 Verification & Screenshots
 
 ### 1. To-Do App Before Changes (v1)
+
 ![To-Do App v1](images/to-do-app-1.png)
 
 **Original version deployed on EKS**
 
 ### 2. To-Do App After CI/CD Update (v2)
+
 ![To-Do App v2](images/to-do-app-2.png)
 
 **Updated version automatically deployed via CircleCI & ArgoCD (e.g., button color change)**
 
-### 3. CircleCI Pipeline  
+### 3. CircleCI Pipeline
+
 ![CircleCI Pipeline](images/circleci-ui-new.png)
 
 **Expected Output:**
+
 - ✅ Build job: Success
 - ✅ Test job: All tests passed
 - ✅ Docker build & push: Image uploaded to Docker Hub
 - ✅ Update manifests: Committed to GitHub
 - ✅ Pipeline runs on every push to main branch
 
-### 4. ArgoCD UI (Application Synced & Healthy)  
+### 4. ArgoCD UI (Application Synced & Healthy)
+
 ![ArgoCD UI](images/argocd-ui-new.png)
 
 **Status Indicators:**
+
 - **Sync Status**: Synced ✅
 - **Health Status**: Healthy ✅
 - Real-time monitoring and auto-sync enabled
 
-### 5. Terminal Verification  
+### 5. Terminal Verification
 
 **Check Nodes:**
+
 ```bash
 kubectl get nodes
 
@@ -276,6 +293,7 @@ ip-10-0-2-124.ec2.internal    Ready    <none>   1h    v1.28.x
 ```
 
 **Check Pods:**
+
 ```bash
 kubectl get pods -n default
 
@@ -286,6 +304,7 @@ todo-app-5f6d8c9b7d-def34    1/1     Running   0          10m
 ```
 
 **Check Service:**
+
 ```bash
 kubectl get svc -n default
 
@@ -295,6 +314,7 @@ todo-app     LoadBalancer   172.20.123.45    a1b2c3d4e5f6g7h8-1234567890.us-east
 ```
 
 **Check ArgoCD Application:**
+
 ```bash
 kubectl get application -n argocd
 
@@ -309,11 +329,11 @@ todo-app   Synced        Healthy
 
 ### Environment Variables (CircleCI)
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DOCKER_USERNAME` | Docker Hub username | `myusername` |
+| Variable          | Description                  | Example          |
+| ----------------- | ---------------------------- | ---------------- |
+| `DOCKER_USERNAME` | Docker Hub username          | `myusername`     |
 | `DOCKER_PASSWORD` | Docker Hub password or token | `dckr_pat_xxxxx` |
-| `GITHUB_TOKEN` | GitHub Personal Access Token | `ghp_xxxxx` |
+| `GITHUB_TOKEN`    | GitHub Personal Access Token | `ghp_xxxxx`      |
 
 ### Terraform Variables
 
@@ -352,12 +372,14 @@ The playbook runs locally and connects to your configured Kubernetes cluster via
 ### Kubernetes Resources
 
 **Deployment** (`k8s/deployment.yaml`):
+
 - Replicas: 2 (configurable)
 - Image: Updated automatically by CircleCI
 - Resource limits: 500m CPU, 512Mi memory
 - Rolling update strategy for zero-downtime deployments
 
 **Service** (`k8s/service.yaml`):
+
 - Type: LoadBalancer
 - Port: 80
 - Target Port: 80
@@ -370,28 +392,33 @@ The playbook runs locally and connects to your configured Kubernetes cluster via
 ### Common Issues
 
 **1. Pods not starting:**
+
 ```bash
 kubectl describe pod <pod-name>
 kubectl logs <pod-name>
 ```
 
 **2. Service not getting external IP:**
+
 ```bash
 kubectl describe svc todo-app
 # Check AWS Load Balancer creation in AWS Console
 ```
 
 **3. ArgoCD sync failing:**
+
 ```bash
 kubectl logs -n argocd deployment/argocd-application-controller
 ```
 
 **4. CircleCI build failing:**
+
 - Check CircleCI dashboard for error logs
 - Verify environment variables are set correctly
 - Ensure Docker Hub credentials are valid
 
 **5. Ansible playbook errors:**
+
 ```bash
 # Run with verbose output
 ansible-playbook -i inventory.ini setup-argocd-helm.yml -v
@@ -457,7 +484,8 @@ terraform destroy
 
 ## 👨‍💻 Author
 
-**Your Name**  
+**Your Name**
+
 - GitHub: [@UdayParkar](https://github.com/UdayParkar)
 - LinkedIn: [uday-parkar](https://linkedin.com/in/uday-parkar)
 - Email: udayparkar2003@gmail.com

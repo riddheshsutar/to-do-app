@@ -486,6 +486,6 @@ terraform destroy
 
 **Your Name**
 
-- GitHub: [@UdayParkar](https://github.com/UdayParkar)
-- LinkedIn: [uday-parkar](https://linkedin.com/in/uday-parkar)
-- Email: udayparkar2003@gmail.com
+- GitHub: [@RiddheshSutar](https://github.com/riddheshsutar/)
+- LinkedIn: [riddheshsutar](https://linkedin.com/in/sutarriddhesh22/)
+- Email: sutarriddhesh@gmail.com

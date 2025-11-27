@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: to-do-app
-          image: sutarriddhesh22/todo-app:2a2c810
+          image: sutarriddhesh22/todo-app:29238cf
           ports:
             - containerPort: 80
